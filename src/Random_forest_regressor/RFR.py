@@ -21,6 +21,6 @@ class RFRModel(object):
 
 
 rfr = RFRModel()
-rfr.load_data("../../data/train.csv", None)
+rfr.load_data("../../data/cleaned_data.csv", None)
 print(rfr.train_x.head(5))
 print(rfr.train_y.head(5))
