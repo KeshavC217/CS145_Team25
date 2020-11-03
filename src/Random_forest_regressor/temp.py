@@ -4,7 +4,8 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression, Perceptron
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 
@@ -21,7 +22,7 @@ data_alabama = data.iloc[::50,:]
 X_temp = data_alabama.iloc[:,0:1].values
 X = np.array([[string_process(x)] for x in X_temp])
 y = data_alabama.iloc[:,1].values
-polynomial_features= PolynomialFeatures(degree=2)
+polynomial_features= PolynomialFeatures(degree=3)
 Xpol = polynomial_features.fit_transform(X)
 reg = LinearRegression().fit(Xpol,y)
 plt.plot(X,y)
