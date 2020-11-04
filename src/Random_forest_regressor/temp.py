@@ -18,23 +18,24 @@ def string_process(x):
 data = pd.read_csv("../../data/train.csv")
 data = data.fillna(data.mean())
 data = data[['Date', 'Confirmed']]
-data_alabama = data.iloc[::50,:]
+data_alabama = data.iloc[46::50,:]
 X_temp = data_alabama.iloc[:,0:1].values
 X = np.array([[string_process(x)] for x in X_temp])
 y = data_alabama.iloc[:,1].values
 polynomial_features= PolynomialFeatures(degree=3)
-Xpol = polynomial_features.fit_transform(X)
-reg = LinearRegression().fit(Xpol,y)
+#Xpol = polynomial_features.fit_transform(X)
+reg = SVR(C=1e5, max_iter=1000)
+reg.fit(X,y)
 plt.plot(X,y)
-plt.plot(X,reg.predict(Xpol))
+plt.plot(X,reg.predict(X))
 
 test_data = pd.read_csv("../../data/test.csv")
 test_data = test_data[['Date']]
 test_data_alabama = test_data.iloc[::50,:]
 test_x_temp = test_data_alabama.iloc[:,0:1].values
 test_x = np.array([[string_process(x)] for x in test_x_temp])
-testx_pol = polynomial_features.fit_transform(test_x)
-predicted_y = reg.predict(testx_pol)
+#testx_pol = polynomial_features.fit_transform(test_x)
+predicted_y = reg.predict(test_x)
 
 plt.plot(test_x, predicted_y)
 plt.show()
