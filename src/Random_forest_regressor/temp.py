@@ -49,12 +49,17 @@ test_data = test_data[['Date']]
 result_matrix_confirmed = np.array([predict_state_confirmed(i,data, test_data) for i in range(50)])
 result_matrix_dead = np.array([predict_state_confirmed(i,data_dead, test_data) for i in range(50)])
 
-with open('basic_pred.csv', mode='w') as prediction_file:
-    prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
+#This code plots the predictions for confirmed, for a state number of choice:
+plot_confirmed(0, result_matrix_confirmed, data, test_data)
+#plot_confirmed(0, result_matrix_dead, data_dead, test_data)
 
-    prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
-    index = range(1300)
-    confirmed_vals = result_matrix_confirmed.T.ravel()
-    death_vals = result_matrix_dead.T.ravel()
-    for i in index:
-        prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
+##This code writes to csv
+# with open('basic_pred.csv', mode='w') as prediction_file:
+#     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
+#
+#     prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
+#     index = range(1300)
+#     confirmed_vals = result_matrix_confirmed.T.ravel()
+#     death_vals = result_matrix_dead.T.ravel()
+#     for i in index:
+#         prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
