@@ -85,12 +85,12 @@ plot_confirmed(17, result_matrix_confirmed, data, test_data)
 #plot_confirmed(49, result_matrix_dead, data_dead, test_data)
 
 ##This code writes to csv
-with open('basic_pred-2.csv', mode='w') as prediction_file:
-    prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
-
-    prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
-    index = range(1300)
-    confirmed_vals = result_matrix_confirmed.T.ravel()
-    death_vals = result_matrix_dead.T.ravel()
-    for i in index:
-        prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
+# with open('basic_pred_4.189.csv', mode='w') as prediction_file:
+#     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
+#
+#     prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
+#     index = range(1300)
+#     confirmed_vals = result_matrix_confirmed.T.ravel()
+#     death_vals = result_matrix_dead.T.ravel()
+#     for i in index:
+#         prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
