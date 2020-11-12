@@ -5,12 +5,40 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.svm import SVR
 import csv
 
+
 def string_process(x):
     y = x[0].split('-')
     return int(y[0]) * 100 + int(y[1]) * 3
 
 
 def predict_state_confirmed(state_index, data_given, test_data_given):
+    data_state = data_given.iloc[state_index::50, :]
+    X_temp = data_state.iloc[:, 0:1].values
+    X = np.array([[string_process(x)] for x in X_temp])
+    y = data_state.iloc[:, 1].values
+    ### Comment for old model
+    copy_y = np.copy(y)
+    orig_state = copy_y[len(y)-1]
+    for i in range(1, len(y)):
+        copy_y[len(copy_y) - i] = copy_y[len(copy_y) - i] - copy_y[len(copy_y) - i - 1]
+    copy_y[0] = copy_y[1]
+    ###
+    polynomial_features = PolynomialFeatures(degree=3)
+    reg = SVR(C=1e5, max_iter=1000)
+    reg.fit(X, copy_y)
+    test_data_state = test_data_given.iloc[::50, :]
+    test_x_temp = test_data_state.iloc[:, 0:1].values
+    test_x = np.array([[string_process(x)] for x in test_x_temp])
+    predicted_y = reg.predict(test_x)
+    ### Comment for old model
+    predicted_y[0] = orig_state
+    for i in range(1, len(predicted_y)):
+        predicted_y[i] += predicted_y[i - 1]
+    ###
+    return predicted_y
+
+
+def predict_state_dead(state_index, data_given, test_data_given):
     data_state = data_given.iloc[state_index::50, :]
     X_temp = data_state.iloc[:, 0:1].values
     X = np.array([[string_process(x)] for x in X_temp])
@@ -46,20 +74,20 @@ data = data[['Date', 'Confirmed']]
 test_data = pd.read_csv("../../data/test.csv")
 test_data = test_data[['Date']]
 
-result_matrix_confirmed = np.array([predict_state_confirmed(i,data, test_data) for i in range(50)])
-result_matrix_dead = np.array([predict_state_confirmed(i,data_dead, test_data) for i in range(50)])
+result_matrix_confirmed = np.array([predict_state_confirmed(i, data, test_data) for i in range(50)])
+result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i in range(50)])
 
-#This code plots the predictions for confirmed, for a state number of choice:
-plot_confirmed(0, result_matrix_confirmed, data, test_data)
-#plot_confirmed(0, result_matrix_dead, data_dead, test_data)
+# This code plots the predictions for confirmed, for a state number of choice:
+#plot_confirmed(4, result_matrix_confirmed, data, test_data)
+plot_confirmed(0, result_matrix_dead, data_dead, test_data)
 
 ##This code writes to csv
-# with open('basic_pred.csv', mode='w') as prediction_file:
-#     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
-#
-#     prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
-#     index = range(1300)
-#     confirmed_vals = result_matrix_confirmed.T.ravel()
-#     death_vals = result_matrix_dead.T.ravel()
-#     for i in index:
-#         prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
+with open('basic_pred-2.csv', mode='w') as prediction_file:
+    prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
+
+    prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
+    index = range(1300)
+    confirmed_vals = result_matrix_confirmed.T.ravel()
+    death_vals = result_matrix_dead.T.ravel()
+    for i in index:
+        prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
