@@ -20,15 +20,12 @@ def predict_state_confirmed(state_index, data_given, test_data_given):
     ### Comment for old model
     copy_y = np.copy(y)
     orig_state = copy_y[len(y)-1]
-    base = copy_y[0]
-    factor =  24000/base
-    copy_y = copy_y * factor
     for i in range(1, len(y)):
         copy_y[len(copy_y) - i] = copy_y[len(copy_y) - i] - copy_y[len(copy_y) - i - 1]
     copy_y[0] = copy_y[1]
     ###
     polynomial_features = PolynomialFeatures(degree=3)
-    reg = SVR(C=1e5, max_iter=1000)
+    reg = SVR(C=100, max_iter=1000)
     reg.fit(X, copy_y)
     test_data_state = test_data_given.iloc[::50, :]
     test_x_temp = test_data_state.iloc[:, 0:1].values
@@ -38,7 +35,7 @@ def predict_state_confirmed(state_index, data_given, test_data_given):
     predicted_y[0] = orig_state
     for i in range(1, len(predicted_y)):
         predicted_y[i] += predicted_y[i - 1]
-    predicted_y = predicted_y / factor
+    predicted_y = predicted_y
     ###
     return predicted_y
 
@@ -84,8 +81,8 @@ result_matrix_confirmed = np.array([predict_state_confirmed(i, data, test_data) 
 result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i in range(50)])
 
 # This code plots the predictions for confirmed, for a state number of choice:
-#plot_confirmed(49, result_matrix_confirmed, data, test_data)
-plot_confirmed(0, result_matrix_dead, data_dead, test_data)
+plot_confirmed(17, result_matrix_confirmed, data, test_data)
+#plot_confirmed(49, result_matrix_dead, data_dead, test_data)
 
 ##This code writes to csv
 with open('basic_pred-2.csv', mode='w') as prediction_file:
