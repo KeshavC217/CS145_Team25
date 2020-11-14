@@ -25,7 +25,7 @@ def predict_state_confirmed(state_index, data_given, test_data_given):
     copy_y[0] = copy_y[1]
     ###
     polynomial_features = PolynomialFeatures(degree=3)
-    reg = SVR(C=100, max_iter=1000)
+    reg = SVR(C=1400, max_iter=1000)
     reg.fit(X, copy_y)
     test_data_state = test_data_given.iloc[::50, :]
     test_x_temp = test_data_state.iloc[:, 0:1].values
@@ -85,7 +85,7 @@ plot_confirmed(17, result_matrix_confirmed, data, test_data)
 #plot_confirmed(49, result_matrix_dead, data_dead, test_data)
 
 ##This code writes to csv
-# with open('basic_pred_4.189.csv', mode='w') as prediction_file:
+# with open('basic_pred_3.803.csv', mode='w') as prediction_file:
 #     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
 #
 #     prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
