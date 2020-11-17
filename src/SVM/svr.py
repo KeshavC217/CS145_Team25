@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.svm import SVR
@@ -25,7 +26,7 @@ def predict_state_confirmed(state_index, data_given, test_data_given):
     copy_y[0] = copy_y[1]
     ###
     polynomial_features = PolynomialFeatures(degree=3)
-    reg = SVR(C=1400, max_iter=1000)
+    reg = SVR(C=2000)
     reg.fit(X, copy_y)
     test_data_state = test_data_given.iloc[::50, :]
     test_x_temp = test_data_state.iloc[:, 0:1].values
@@ -81,11 +82,11 @@ result_matrix_confirmed = np.array([predict_state_confirmed(i, data, test_data) 
 result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i in range(50)])
 
 # This code plots the predictions for confirmed, for a state number of choice:
-plot_confirmed(17, result_matrix_confirmed, data, test_data)
-#plot_confirmed(49, result_matrix_dead, data_dead, test_data)
+#plot_confirmed(4, result_matrix_confirmed, data, test_data)
+plot_confirmed(0, result_matrix_dead, data_dead, test_data)
 
 ##This code writes to csv
-# with open('basic_pred_3.803.csv', mode='w') as prediction_file:
+# with open('basic_pred_x.csv', mode='w') as prediction_file:
 #     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
 #
 #     prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
