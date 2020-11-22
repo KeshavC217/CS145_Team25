@@ -24,7 +24,7 @@ def confirmed_processing(data):
     order.remove('Deaths')
     order.append('Confirmed')
     data = data[order]
-    data = data.drop(columns=['ID', 'Mortality_Rate', 'Testing_Rate', 'Hospitalization_Rate'])
+    data = data.drop(columns=['ID', 'Mortality_Rate', 'Testing_Rate', 'Hospitalization_Rate', 'People_Hospitalized'])
     return data
 
 
