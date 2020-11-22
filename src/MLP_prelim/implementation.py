@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
+from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 
 
@@ -51,7 +52,7 @@ def pred_people_tested(stateno):
 incident_predictions = np.array([pred_incident_rate(i) for i in range(50)]).T.ravel()
 tested_predictions = np.array([pred_people_tested(i) for i in range(50)]).T.ravel()
 
-reg = RandomForestRegressor()
+reg = MLPRegressor()
 reg.fit(X_confirmed, y_confirmed)
 
 fin_inc_frame = pd.DataFrame()
@@ -61,7 +62,19 @@ fin_inc_frame['People_Tested'] = tested_predictions
 
 final_pred = reg.predict(fin_inc_frame)
 
-print(final_pred)
 
+def sanity_plot(state_no):
+    curr_conf_date = X_confirmed['Date'].iloc[state_no::50]
+    curr_conf_pred = y_confirmed.iloc[state_no::50]
+    plt.plot(curr_conf_date, curr_conf_pred)
+
+    future_conf_date = fin_inc_frame['Date'].iloc[state_no::50]
+    future_conf_pred = final_pred[state_no::50]
+    plt.plot(future_conf_date, future_conf_pred)
+
+    plt.show()
+
+
+sanity_plot(48)
 
 
