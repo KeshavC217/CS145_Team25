@@ -1,0 +1,41 @@
+import pandas as pd
+
+
+def string_process(x):
+    y = x.split('-')
+    return int(y[0]) * 100 + int(y[1]) * 3
+
+
+def init_process():
+    data = pd.read_csv("../../data/train.csv")
+    data = data.fillna(data.mean())
+
+    data['Date'] = [string_process(i) for i in data['Date']]
+    data = data.drop(columns=['Recovered', 'Active'])
+    return data
+
+
+def confirmed_processing(data):
+    order = data.keys()
+    order = order.tolist()
+    order.remove('Confirmed')
+    order.remove('Deaths')
+    order.append('Confirmed')
+    data = data[order]
+    data = data.drop(columns=['ID', 'Mortality_Rate', 'Testing_Rate', 'Hospitalization_Rate'])
+    return data
+
+
+def death_processing(data):
+    order = data.keys()
+    order = order.tolist()
+    order.remove('Confirmed')
+    order.remove('Deaths')
+    order.append('Deaths')
+    data = data[order]
+    data = data.drop(columns=['ID', 'Incident_Rate', 'Testing_Rate'])
+    return data
+
+
+confirmed_data = init_process()
+confirmed_processing(confirmed_data)
