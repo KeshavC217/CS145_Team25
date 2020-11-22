@@ -1,11 +1,9 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 from sklearn.svm import SVR
-from sklearn.tree import DecisionTreeRegressor
 
 
 # The point of this approach is to try and predict each data column separately
@@ -53,7 +51,17 @@ def pred_people_tested(stateno):
 incident_predictions = np.array([pred_incident_rate(i) for i in range(50)]).T.ravel()
 tested_predictions = np.array([pred_people_tested(i) for i in range(50)]).T.ravel()
 
+reg = RandomForestRegressor()
+reg.fit(X_confirmed, y_confirmed)
 
+fin_inc_frame = pd.DataFrame()
+fin_inc_frame['Date'] = [string_process(i) for i in test_data['Date']]
+fin_inc_frame['Incident_Rate'] = incident_predictions
+fin_inc_frame['People_Tested'] = tested_predictions
+
+final_pred = reg.predict(fin_inc_frame)
+
+print(final_pred)
 
 
 
