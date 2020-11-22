@@ -13,7 +13,7 @@ def init_process():
     data = data.fillna(data.mean())
 
     data['Date'] = [string_process(i) for i in data['Date']]
-    data = data.drop(columns=['Recovered', 'Active'])
+    data = data.drop(columns=['Recovered', 'Active', 'Province_State'])
     return data
 
 
