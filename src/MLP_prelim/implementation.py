@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 from sklearn.neural_network import MLPRegressor
@@ -52,7 +51,7 @@ def pred_people_tested(stateno):
 incident_predictions = np.array([pred_incident_rate(i) for i in range(50)]).T.ravel()
 tested_predictions = np.array([pred_people_tested(i) for i in range(50)]).T.ravel()
 
-reg = MLPRegressor()
+reg = MLPRegressor(solver='lbfgs')
 reg.fit(X_confirmed, y_confirmed)
 
 fin_inc_frame = pd.DataFrame()
@@ -75,6 +74,6 @@ def sanity_plot(state_no):
     plt.show()
 
 
-sanity_plot(48)
+sanity_plot(43)
 
 

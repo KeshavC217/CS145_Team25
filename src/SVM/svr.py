@@ -47,8 +47,8 @@ def predict_state_dead(state_index, data_given, test_data_given):
     X = np.array([[string_process(x)] for x in X_temp])
     y = data_state.iloc[:, 1].values
     polynomial_features = PolynomialFeatures(degree=3)
-    param = y[len(y)-1] *3
-    reg = SVR(C=param, max_iter=1000)
+    param = y[len(y)-1] * 5
+    reg = SVR(C=param)
     reg.fit(X, y)
     test_data_state = test_data_given.iloc[::50, :]
     test_x_temp = test_data_state.iloc[:, 0:1].values
@@ -83,7 +83,7 @@ result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i
 
 # This code plots the predictions for confirmed, for a state number of choice:
 #plot_confirmed(4, result_matrix_confirmed, data, test_data)
-plot_confirmed(0, result_matrix_dead, data_dead, test_data)
+plot_confirmed(5, result_matrix_dead, data_dead, test_data)
 
 ##This code writes to csv
 # with open('basic_pred_x.csv', mode='w') as prediction_file:
