@@ -62,18 +62,30 @@ fin_inc_frame['People_Tested'] = tested_predictions
 final_pred = reg.predict(fin_inc_frame)
 
 
+def prediction_adjuster(state_no):
+    start_arr = np.array(y_confirmed.iloc[state_no::50].values)
+    start_point = start_arr[len(start_arr)-1]
+    curr_pred = final_pred[state_no::50]
+    diff = start_point - curr_pred[0]
+    curr_pred = curr_pred + diff
+    return curr_pred
+
+
+new_preds = np.array([prediction_adjuster(i) for i in range(50)])
+final_pred_2 = new_preds.T.ravel()
+
 def sanity_plot(state_no):
     curr_conf_date = X_confirmed['Date'].iloc[state_no::50]
     curr_conf_pred = y_confirmed.iloc[state_no::50]
     plt.plot(curr_conf_date, curr_conf_pred)
 
     future_conf_date = fin_inc_frame['Date'].iloc[state_no::50]
-    future_conf_pred = final_pred[state_no::50]
+    future_conf_pred = final_pred_2[state_no::50]
     plt.plot(future_conf_date, future_conf_pred)
 
     plt.show()
 
 
-sanity_plot(43)
+sanity_plot(35)
 
 
