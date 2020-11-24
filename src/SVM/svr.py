@@ -20,7 +20,7 @@ def predict_state_confirmed(state_index, data_given, test_data_given):
     y = data_state.iloc[:, 1].values
     ### Comment for old model
     copy_y = np.copy(y)
-    orig_state = copy_y[len(y)-1]
+    orig_state = copy_y[len(y) - 1]
     for i in range(1, len(y)):
         copy_y[len(copy_y) - i] = copy_y[len(copy_y) - i] - copy_y[len(copy_y) - i - 1]
     copy_y[0] = copy_y[1]
@@ -47,13 +47,24 @@ def predict_state_dead(state_index, data_given, test_data_given):
     X = np.array([[string_process(x)] for x in X_temp])
     y = data_state.iloc[:, 1].values
     polynomial_features = PolynomialFeatures(degree=3)
-    param = y[len(y)-1] * 5
+    param = y[len(y) - 1] * 5
     reg = SVR(C=param)
     reg.fit(X, y)
     test_data_state = test_data_given.iloc[::50, :]
     test_x_temp = test_data_state.iloc[:, 0:1].values
     test_x = np.array([[string_process(x)] for x in test_x_temp])
     predicted_y = reg.predict(test_x)
+    temp = np.floor(len(predicted_y) / 2)
+    if predicted_y[-1] < predicted_y[int(temp)]:
+        newreg = LinearRegression()
+        newX = X[int(np.floor(len(X) / 2)):]
+        newY = y[int(np.floor(len(y) / 2)):]
+        newreg.fit(newX, newY)
+        predicted_y = newreg.predict(test_x)
+        diff = newY[-1] - predicted_y[0]
+        predicted_y += diff
+    # TODO: OPTIONALLY GO WITH EITHER LINREG OR SVR BASED ON IF LAST ELEMENT IS GREATER THAN MID
+    # TODO: IF USING LINREG, USE BIAS ADJUSTER
     return predicted_y
 
 
@@ -82,10 +93,9 @@ result_matrix_confirmed = np.array([predict_state_confirmed(i, data, test_data) 
 result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i in range(50)])
 
 # This code plots the predictions for confirmed, for a state number of choice:
-#plot_confirmed(4, result_matrix_confirmed, data, test_data)
-plot_confirmed(5, result_matrix_dead, data_dead, test_data)
-
-##This code writes to csv
+# plot_confirmed(14, result_matrix_confirmed, data, test_data)
+plot_confirmed(1, result_matrix_dead, data_dead, test_data)
+# #This code writes to csv
 # with open('basic_pred_x.csv', mode='w') as prediction_file:
 #     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
 #
