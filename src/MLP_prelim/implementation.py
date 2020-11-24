@@ -51,7 +51,7 @@ def pred_people_tested(stateno):
 incident_predictions = np.array([pred_incident_rate(i) for i in range(50)]).T.ravel()
 tested_predictions = np.array([pred_people_tested(i) for i in range(50)]).T.ravel()
 
-reg = MLPRegressor(learning_rate_init=0.008)
+reg = MLPRegressor(learning_rate_init=0.008, hidden_layer_sizes=(120,), random_state=1)
 reg.fit(X_confirmed, y_confirmed)
 
 fin_inc_frame = pd.DataFrame()
@@ -66,7 +66,7 @@ def prediction_adjuster(state_no):
     start_arr = np.array(y_confirmed.iloc[state_no::50].values)
     start_point = start_arr[len(start_arr)-1]
     curr_pred = final_pred[state_no::50]
-    diff = start_point - curr_pred[0]
+    diff = start_point - 2* curr_pred[0] + curr_pred[1]
     curr_pred = curr_pred + diff
     return curr_pred
 
@@ -86,6 +86,6 @@ def sanity_plot(state_no):
     plt.show()
 
 
-sanity_plot(47)
+sanity_plot(15)
 
 
