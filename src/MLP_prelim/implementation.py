@@ -51,7 +51,7 @@ def pred_people_tested(stateno):
 incident_predictions = np.array([pred_incident_rate(i) for i in range(50)]).T.ravel()
 tested_predictions = np.array([pred_people_tested(i) for i in range(50)]).T.ravel()
 
-reg = MLPRegressor(solver='lbfgs')
+reg = MLPRegressor(learning_rate_init=0.008)
 reg.fit(X_confirmed, y_confirmed)
 
 fin_inc_frame = pd.DataFrame()
@@ -86,6 +86,6 @@ def sanity_plot(state_no):
     plt.show()
 
 
-sanity_plot(35)
+sanity_plot(47)
 
 
