@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.svm import SVR
 import csv
@@ -25,7 +24,6 @@ def predict_state_confirmed(state_index, data_given, test_data_given):
         copy_y[len(copy_y) - i] = copy_y[len(copy_y) - i] - copy_y[len(copy_y) - i - 1]
     copy_y[0] = copy_y[1]
     ###
-    polynomial_features = PolynomialFeatures(degree=3)
     reg = SVR(C=2000)
     reg.fit(X, copy_y)
     test_data_state = test_data_given.iloc[::50, :]
@@ -46,7 +44,6 @@ def predict_state_dead(state_index, data_given, test_data_given):
     X_temp = data_state.iloc[:, 0:1].values
     X = np.array([[string_process(x)] for x in X_temp])
     y = data_state.iloc[:, 1].values
-    polynomial_features = PolynomialFeatures(degree=3)
     param = y[len(y) - 1] * 5
     reg = SVR(C=param)
     reg.fit(X, y)
@@ -63,8 +60,6 @@ def predict_state_dead(state_index, data_given, test_data_given):
         predicted_y = newreg.predict(test_x)
         diff = newY[-1] - 2*predicted_y[0] + predicted_y[1]
         predicted_y += diff
-    # TODO: OPTIONALLY GO WITH EITHER LINREG OR SVR BASED ON IF LAST ELEMENT IS GREATER THAN MID
-    # TODO: IF USING LINREG, USE BIAS ADJUSTER
     return predicted_y
 
 
