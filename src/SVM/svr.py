@@ -54,15 +54,16 @@ def predict_state_dead(state_index, data_given, test_data_given):
     test_x_temp = test_data_state.iloc[:, 0:1].values
     test_x = np.array([[string_process(x)] for x in test_x_temp])
     predicted_y = reg.predict(test_x)
-    temp = np.floor(len(predicted_y) / 2)
-    if predicted_y[-1] < predicted_y[int(temp)]:
-        newreg = LinearRegression()
-        newX = X[len(X) - 10:]
-        newY = y[len(y) - 10:]
-        newreg.fit(newX, newY)
-        predicted_y = newreg.predict(test_x)
-        diff = newY[-1] - 2*predicted_y[0] + predicted_y[1]
-        predicted_y += diff
+    temp = np.floor(len(predicted_y) / 1.5)
+    newreg = LinearRegression()
+    newX = X[len(X) - 10:]
+    newY = y[len(y) - 10:]
+    newreg.fit(newX, newY)
+    predicted_y_2 = newreg.predict(test_x)
+    diff = newY[-1] - 2 * predicted_y_2[0] + predicted_y_2[1]
+    predicted_y_2 += diff
+    if predicted_y[-1] < predicted_y[int(temp)] or predicted_y_2[-1] > predicted_y[-1]:
+        predicted_y=predicted_y_2
     # TODO: OPTIONALLY GO WITH EITHER LINREG OR SVR BASED ON IF LAST ELEMENT IS GREATER THAN MID
     # TODO: IF USING LINREG, USE BIAS ADJUSTER
     return predicted_y
@@ -94,14 +95,14 @@ result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i
 
 # This code plots the predictions for confirmed, for a state number of choice:
 #plot_confirmed(43, result_matrix_confirmed, data, test_data)
-plot_confirmed(8, result_matrix_dead, data_dead, test_data)
+plot_confirmed(0, result_matrix_dead, data_dead, test_data)
 # #This code writes to csv
-with open('basic_pred_x.csv', mode='w') as prediction_file:
-    prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
-
-    prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
-    index = range(1300)
-    confirmed_vals = result_matrix_confirmed.T.ravel()
-    death_vals = result_matrix_dead.T.ravel()
-    for i in index:
-        prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
+# with open('basic_pred_x.csv', mode='w') as prediction_file:
+#     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
+#
+#     prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
+#     index = range(1300)
+#     confirmed_vals = result_matrix_confirmed.T.ravel()
+#     death_vals = result_matrix_dead.T.ravel()
+#     for i in index:
+#         prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
