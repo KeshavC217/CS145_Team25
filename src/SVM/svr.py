@@ -57,8 +57,8 @@ def predict_state_dead(state_index, data_given, test_data_given):
     temp = np.floor(len(predicted_y) / 2)
     if predicted_y[-1] < predicted_y[int(temp)]:
         newreg = LinearRegression()
-        newX = X[int(np.floor(len(X) / 2)):]
-        newY = y[int(np.floor(len(y) / 2)):]
+        newX = X[len(X) - 10:]
+        newY = y[len(y) - 10:]
         newreg.fit(newX, newY)
         predicted_y = newreg.predict(test_x)
         diff = newY[-1] - 2*predicted_y[0] + predicted_y[1]
@@ -93,8 +93,8 @@ result_matrix_confirmed = np.array([predict_state_confirmed(i, data, test_data) 
 result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i in range(50)])
 
 # This code plots the predictions for confirmed, for a state number of choice:
-plot_confirmed(43, result_matrix_confirmed, data, test_data)
-#plot_confirmed(1, result_matrix_dead, data_dead, test_data)
+#plot_confirmed(43, result_matrix_confirmed, data, test_data)
+plot_confirmed(8, result_matrix_dead, data_dead, test_data)
 # #This code writes to csv
 with open('basic_pred_x.csv', mode='w') as prediction_file:
     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
