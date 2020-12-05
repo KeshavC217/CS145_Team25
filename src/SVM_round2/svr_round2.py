@@ -44,6 +44,7 @@ def predict_state_dead(state_index, data_given, test_data_given):
     X_temp = data_state.iloc[:, 0:1].values
     X = np.array([[string_process(x)] for x in X_temp])
     y = data_state.iloc[:, 1].values
+    polynomial_features = PolynomialFeatures(degree=3)
     param = y[len(y) - 1] * 5
     reg = SVR(C=param)
     reg.fit(X, y)
@@ -51,18 +52,18 @@ def predict_state_dead(state_index, data_given, test_data_given):
     test_x_temp = test_data_state.iloc[:, 0:1].values
     test_x = np.array([[string_process(x)] for x in test_x_temp])
     predicted_y = reg.predict(test_x)
-    temp = np.floor(len(predicted_y) / 2)
-    if predicted_y[-1] < predicted_y[int(temp)]:
-        newreg = LinearRegression()
-        newX = X[int(np.floor(len(X) / 2)):]
-        newY = y[int(np.floor(len(y) / 2)):]
-        newreg.fit(newX, newY)
-        predicted_y = newreg.predict(test_x)
-        diff = newY[-1] - 2*predicted_y[0] + predicted_y[1]
-        predicted_y += diff
-    else:
-        diff = y[-1] - 2 * predicted_y[0] + predicted_y[1]
-        predicted_y += diff
+    temp = np.floor(len(predicted_y) / 1.5)
+    newreg = LinearRegression()
+    newX = X[len(X) - 14:]
+    newY = y[len(y) - 14:]
+    newreg.fit(newX, newY)
+    predicted_y_2 = newreg.predict(test_x)
+    diff = newY[-1] - 2 * predicted_y_2[0] + predicted_y_2[1]
+    predicted_y_2 += diff
+    if predicted_y[-1] < predicted_y[int(temp)] or predicted_y_2[-1] > predicted_y[-1]:
+        predicted_y=predicted_y_2
+    # TODO: OPTIONALLY GO WITH EITHER LINREG OR SVR BASED ON IF LAST ELEMENT IS GREATER THAN MID
+    # TODO: IF USING LINREG, USE BIAS ADJUSTER
     return predicted_y
 
 
@@ -80,7 +81,7 @@ def plot_confirmed(state_no, result_matrix_given, data_given, test_data_given):
     plt.show()
 
 
-data = pd.read_csv("../../data/train_round2.csv")
+data = pd.read_csv("modified_train.csv")
 data = data.fillna(data.mean())
 data_dead = data[['Date', 'Deaths']]
 data = data[['Date', 'Confirmed']]
@@ -93,13 +94,14 @@ result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i
 # This code plots the predictions for confirmed, for a state number of choice:
 #plot_confirmed(4, result_matrix_confirmed, data, test_data)
 plot_confirmed(4, result_matrix_dead, data_dead, test_data)
-# #This code writes to csv
+
+#This code writes to csv
 with open('basic_pred_round2_x.csv', mode='w') as prediction_file:
     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
 
     prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
-    index = range(700,1050)
+    index = range(150,500)
     confirmed_vals = result_matrix_confirmed.T.ravel()
     death_vals = result_matrix_dead.T.ravel()
     for i in index:
-        prediction_writer.writerow([str(i-700), str(confirmed_vals[i]), str(death_vals[i])])
+        prediction_writer.writerow([str(i-150), str(confirmed_vals[i]), str(death_vals[i])])
