@@ -22,4 +22,4 @@ def give_mape(ground_truth_path, prediction_path):
     return total
 
 
-print(give_mape("ground_truth.csv", "team25.csv"))
+print(give_mape("ground_truth.csv", "team25Prophet.csv"))
