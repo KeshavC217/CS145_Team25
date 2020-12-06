@@ -9,9 +9,9 @@ states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 
           'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas',
           'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']
 
-dates = ["12-04-2020"]
+dates = ["12-05-2020"]
 
-count = 11800
+count = 11850
 
 with open('train_add.csv', mode='w') as prediction_file:
     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,

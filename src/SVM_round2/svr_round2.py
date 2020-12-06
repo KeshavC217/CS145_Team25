@@ -24,7 +24,7 @@ def predict_state_confirmed(state_index, data_given, test_data_given):
         copy_y[len(copy_y) - i] = copy_y[len(copy_y) - i] - copy_y[len(copy_y) - i - 1]
     copy_y[0] = copy_y[1]
     ###
-    reg = SVR(C=2000)
+    reg = SVR(C=1650)
     reg.fit(X, copy_y)
     test_data_state = test_data_given.iloc[::50, :]
     test_x_temp = test_data_state.iloc[:, 0:1].values
@@ -54,8 +54,8 @@ def predict_state_dead(state_index, data_given, test_data_given):
     predicted_y = reg.predict(test_x)
     temp = np.floor(len(predicted_y) / 1.5)
     newreg = LinearRegression()
-    newX = X[len(X) - 14:]
-    newY = y[len(y) - 14:]
+    newX = X[len(X) - 8:]
+    newY = y[len(y) - 8:]
     newreg.fit(newX, newY)
     predicted_y_2 = newreg.predict(test_x)
     diff = newY[-1] - 2 * predicted_y_2[0] + predicted_y_2[1]
@@ -92,16 +92,16 @@ result_matrix_confirmed = np.array([predict_state_confirmed(i, data, test_data) 
 result_matrix_dead = np.array([predict_state_dead(i, data_dead, test_data) for i in range(50)])
 
 # This code plots the predictions for confirmed, for a state number of choice:
-#plot_confirmed(4, result_matrix_confirmed, data, test_data)
-plot_confirmed(4, result_matrix_dead, data_dead, test_data)
+plot_confirmed(4, result_matrix_confirmed, data, test_data)
+#plot_confirmed(49, result_matrix_dead, data_dead, test_data)
 
 #This code writes to csv
 with open('basic_pred_round2_x.csv', mode='w') as prediction_file:
     prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,lineterminator = '\n')
 
     prediction_writer.writerow(['ForecastID','Confirmed','Deaths'])
-    index = range(150,500)
+    index = range(50,400)
     confirmed_vals = result_matrix_confirmed.T.ravel()
     death_vals = result_matrix_dead.T.ravel()
     for i in index:
-        prediction_writer.writerow([str(i-150), str(confirmed_vals[i]), str(death_vals[i])])
+        prediction_writer.writerow([str(i-50), str(confirmed_vals[i]), str(death_vals[i])])
