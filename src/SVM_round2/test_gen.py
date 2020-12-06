@@ -7,7 +7,7 @@ states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 
           'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas',
           'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']
 
-dates = ["12-04-2020", "12-05-2020", "12-06-2020", "12-07-2020",
+dates = ["12-05-2020", "12-06-2020", "12-07-2020",
          "12-08-2020", "12-09-2020", "12-10-2020", "12-11-2020", "12-12-2020", "12-13-2020"]
 
 with open('modified_test.csv', mode='w') as prediction_file:
