@@ -91,7 +91,7 @@ def svr(train_path, test_path, isFuture):
 
     # This code plots the predictions for confirmed, for a state number of choice:
     # plot_confirmed(43, result_matrix_confirmed, data, test_data)
-    #plot_confirmed(0, result_matrix_dead, data_dead, test_data)
+    # plot_confirmed(0, result_matrix_dead, data_dead, test_data)
     # This code writes to csv
     with open('team25.csv', mode='w') as prediction_file:
         prediction_writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL,
@@ -111,4 +111,5 @@ def svr(train_path, test_path, isFuture):
             for i in index:
                 prediction_writer.writerow([str(i), str(confirmed_vals[i]), str(death_vals[i])])
 
-svr("train.csv","test.csv",False)
+
+svr("modified_train.csv", "modified_test.csv", True)
