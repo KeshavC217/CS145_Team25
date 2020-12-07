@@ -10,8 +10,6 @@ Given COVID statistics from each state, predict the future cases and deaths.
 - [Python 3](https://www.python.org/downloads/)
 - [statsmodels](https://www.statsmodels.org/stable/install.html)
 
-If your `python3` interpreter path is not in `/usr/bin/python3`, replace the path to `python3` to the correct path in the first line (`#! <path_to_python>)` of `scheduler` 
-
 Make sure to run `pip install statsmodels`.
 
 ## Usage
