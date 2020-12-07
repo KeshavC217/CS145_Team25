@@ -57,7 +57,11 @@ def arima(train_path, test_path, isFuture=False):
     pred_cases = []
     pred_dead = []
     fid = 0
-    for i in range(days):
+    if isFuture:
+        base = 1
+    else:
+        base = 0
+    for i in range(base,days):
         for j in state_order:
             projection = predictions[j].iloc[i]
             pred_cases.append(int(projection['Confirmed']))
@@ -103,5 +107,5 @@ print('mape: ', give_mape('team25.csv', '../ValidationTester/ground_truth.csv'))
 # round2
 print('ROUND 2')
 # arima("../../data/train_round2.csv", "../../data/test_round2.csv", isFuture=True)
-arima("../SVM_round2/modified_train.csv", "../SVM_round2/modified_test.csv", isFuture=True)
+arima("../SVM_round2/modified_train.csv", "../../data/test_round2.csv", isFuture=True)
 
