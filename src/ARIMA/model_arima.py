@@ -86,7 +86,7 @@ def give_mape(ground_truth_path, prediction_path):
     return total
 
 
-round1
+# round1
 arima("../../data/train.csv", "../../data/test.csv")
 print('mape: ', give_mape('team25.csv', '../ValidationTester/ground_truth.csv'))
 
