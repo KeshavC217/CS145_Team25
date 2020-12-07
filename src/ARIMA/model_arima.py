@@ -1,24 +1,25 @@
+# necessary imports
 import numpy as np
-import sklearn 
 import pandas as pd
+import sklearn 
 import matplotlib.pyplot as plt
 import scipy
-from scipy.integrate import odeint
 import math
-from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+# suppress convergence warnings
 import warnings
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 warnings.simplefilter('ignore', ConvergenceWarning)
 
 def arima(train_path, test_path, isFuture=False):
-    def predictARIMA(X, p, d, q, day):
-        # model = ARIMA(X, order=(p,d,q)).fit()
-        # prediction = model.predict(start = len(X), end = len(X) + days)
-        model = SARIMAX(X, order=(p,d,q), enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
-        prediction = model.forecast(days)
 
-        return prediction
+    CONFIRMED_PARAMS = (3,2,1)
+    DEATH_PARAMS = (4,2,3)
+    if isFuture:
+        days = 8
+    else:
+        days = 26
 
     print('loading data...', end='')
     train = pd.read_csv(train_path)
@@ -30,35 +31,31 @@ def arima(train_path, test_path, isFuture=False):
         statesdata[s] = train.loc[train['Province_State'] == s ,:]
     print('done')
 
-    if isFuture:
-        days = 8
-    else:
-        days = 26
-
     print('making state predictions...', end='')
-    proj = {}
+    predictions = {}
     for s in states:
-        a = statesdata[s].reset_index()
-        confirmed = a['Confirmed']
-        deaths = a['Deaths']
+        temp = statesdata[s].reset_index()
+        confirmed = temp['Confirmed'].values
+        deaths = temp['Deaths'].values
         
-        X, Y = confirmed.values, deaths.values
-        forecastC = predictARIMA(X, 3,2,1, days) # BEST PARAMS SO FAR ARE 3,2,1
-        forecastD = predictARIMA(Y, 4,2,3, days) # BEST PARAMS SO FAR ARE 4,2,3
+        confirmed_model = SARIMAX(confirmed, order=CONFIRMED_PARAMS, enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
+        forecasted_confirmed = confirmed_model.forecast(days)
 
-        df = {'Confirmed': forecastC, 'Deaths': forecastD}
-        
-        proj[s] = pd.DataFrame(df)
+        deaths_model = SARIMAX(deaths, order=DEATH_PARAMS, enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
+        forecasted_deaths = deaths_model.forecast(days)
+
+        df = {'Confirmed': forecasted_confirmed, 'Deaths': forecasted_deaths}
+        predictions[s] = pd.DataFrame(df)
     print('done')
 
     print('creating output file...', end='')
-    order = test.loc[0:49,'Province_State']
+    state_order = test.loc[0:49,'Province_State']
     conf = []
     dead = []
     fid = 0
     for i in range(days):
-        for j in order:
-            projection = proj[j].iloc[i]
+        for j in state_order:
+            projection = predictions[j].iloc[i]
             conf.append(int(projection['Confirmed']))
             dead.append(int(projection['Deaths']))
             fid+=1
