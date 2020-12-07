@@ -13,14 +13,16 @@ from statsmodels.tools.sm_exceptions import ConvergenceWarning
 warnings.simplefilter('ignore', ConvergenceWarning)
 
 def arima(train_path, test_path, isFuture=False):
+    '''Main driver function for ARIMA. Takes in training and testing path and extra flag to denote future prediction'''
 
-    CONFIRMED_PARAMS = (3,2,1)
+    CASES_PARAMS = (3,2,1)
     DEATH_PARAMS = (4,2,3)
     if isFuture:
         days = 8
     else:
         days = 26
 
+    # --- LOAD AND PREPARE TRAINING AND TESTING DATA ---
     print('loading data...', end='')
     train = pd.read_csv(train_path)
     test = pd.read_csv(test_path)
@@ -31,37 +33,39 @@ def arima(train_path, test_path, isFuture=False):
         statesdata[s] = train.loc[train['Province_State'] == s ,:]
     print('done')
 
+    # --- MAKE STATE BY STATE PREDICTIONS ---
     print('making state predictions...', end='')
     predictions = {}
     for s in states:
         temp = statesdata[s].reset_index()
-        confirmed = temp['Confirmed'].values
+        confirmed_cases = temp['Confirmed'].values
         deaths = temp['Deaths'].values
         
-        confirmed_model = SARIMAX(confirmed, order=CONFIRMED_PARAMS, enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
-        forecasted_confirmed = confirmed_model.forecast(days)
+        cases_model = SARIMAX(confirmed_cases, order=CASES_PARAMS, enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
+        forecasted_cases = cases_model.forecast(days)
 
         deaths_model = SARIMAX(deaths, order=DEATH_PARAMS, enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
         forecasted_deaths = deaths_model.forecast(days)
 
-        df = {'Confirmed': forecasted_confirmed, 'Deaths': forecasted_deaths}
+        df = {'Confirmed': forecasted_cases, 'Deaths': forecasted_deaths}
         predictions[s] = pd.DataFrame(df)
     print('done')
 
+    # --- COLLATE PREDICTIONS AND WRITE OUTPUT ---
     print('creating output file...', end='')
     state_order = test.loc[0:49,'Province_State']
-    conf = []
-    dead = []
+    pred_cases = []
+    pred_dead = []
     fid = 0
     for i in range(days):
         for j in state_order:
             projection = predictions[j].iloc[i]
-            conf.append(int(projection['Confirmed']))
-            dead.append(int(projection['Deaths']))
-            fid+=1
+            pred_cases.append(int(projection['Confirmed']))
+            pred_dead.append(int(projection['Deaths']))
+            fid += 1
 
-    test['Confirmed'] = conf
-    test['Deaths'] = dead
+    test['Confirmed'] = pred_cases
+    test['Deaths'] = pred_dead
     submission = test.drop(columns=['Province_State', 'Date'])
     if isFuture:
         submission.to_csv('team25_round2.csv', index = False, header = True)
