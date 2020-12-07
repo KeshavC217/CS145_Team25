@@ -102,5 +102,6 @@ print('mape: ', give_mape('team25.csv', '../ValidationTester/ground_truth.csv'))
 
 # round2
 print('ROUND 2')
+# arima("../../data/train_round2.csv", "../../data/test_round2.csv", isFuture=True)
 arima("../SVM_round2/modified_train.csv", "../SVM_round2/modified_test.csv", isFuture=True)
 

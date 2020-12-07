@@ -22,7 +22,7 @@ def sanity_plot(training_path, prediction_path, state_no, plot_confirmed=True):
     plt.show()
 
 
-sanity_plot("../SVM_round2/modified_train.csv", "../Final_SVM/team25.csv", 4, False)
+sanity_plot("../SVM_round2/modified_train.csv", "../ARIMA/team25_round2.csv", 4, False)
 
 # If you want to plot all 50:
 # for i in range(50):
