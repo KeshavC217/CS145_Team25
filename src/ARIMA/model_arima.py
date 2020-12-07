@@ -27,9 +27,9 @@ def arima(train_path, test_path, isFuture=False):
     print('done')
 
     if isFuture:
-        days = 26
-    else:
         days = 7
+    else:
+        days = 26
 
     print('making state predictions...', end='')
     proj = {}
@@ -58,6 +58,7 @@ def arima(train_path, test_path, isFuture=False):
             conf.append(int(projection['Confirmed']))
             dead.append(int(projection['Deaths']))
             fid+=1
+
     test['Confirmed'] = conf
     test['Deaths'] = dead
     submission = test.drop(columns=['Province_State', 'Date'])
@@ -85,6 +86,9 @@ def give_mape(ground_truth_path, prediction_path):
     return total
 
 
+round1
 arima("../../data/train.csv", "../../data/test.csv")
-
 print('mape: ', give_mape('team25.csv', '../ValidationTester/ground_truth.csv'))
+
+
+
