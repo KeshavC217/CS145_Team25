@@ -14,8 +14,14 @@ Make sure to run `pip install statsmodels`.
 
 ## Usage
 
-Run arima model:
-`python3 model_arima.py`. The output will look as such:
+Prepare model inputs:
+
+Set `train_path` and `test_path` to appropriate datasets. By default, `isFuture=False`, meaning predict round1, but `isFuture=True` changes the prediction to round2.
+
+For round1, calculate MAPE using helper function with crawled ground truth.
+
+Run arima model: `python3 model_arima.py`. 
+The output will look as such:
 ```
 $ python3 model_arima.py 
 ROUND 1
@@ -28,3 +34,4 @@ loading data...done
 making state predictions...done
 creating output file...done
 ```
+
