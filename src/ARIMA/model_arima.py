@@ -6,14 +6,18 @@ import scipy
 from scipy.integrate import odeint
 import math
 from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 import warnings
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 warnings.simplefilter('ignore', ConvergenceWarning)
 
 def arima(train_path, test_path, isFuture=False):
     def predictARIMA(X, p, d, q, day):
-        model = ARIMA(X, order=(p,d,q)).fit()
-        prediction = model.predict(start = len(X), end = len(X) + days)
+        # model = ARIMA(X, order=(p,d,q)).fit()
+        # prediction = model.predict(start = len(X), end = len(X) + days)
+        model = SARIMAX(X, order=(p,d,q), enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
+        prediction = model.forecast(days)
+
         return prediction
 
     print('loading data...', end='')
@@ -27,7 +31,7 @@ def arima(train_path, test_path, isFuture=False):
     print('done')
 
     if isFuture:
-        days = 7
+        days = 8
     else:
         days = 26
 
@@ -62,7 +66,11 @@ def arima(train_path, test_path, isFuture=False):
     test['Confirmed'] = conf
     test['Deaths'] = dead
     submission = test.drop(columns=['Province_State', 'Date'])
-    submission.to_csv('team25.csv', index = False, header = True)
+    if isFuture:
+        submission.to_csv('team25_round2.csv', index = False, header = True)
+    else:
+        submission.to_csv('team25_round1.csv', index = False, header = True)
+
     print('done')
 
 
@@ -87,8 +95,11 @@ def give_mape(ground_truth_path, prediction_path):
 
 
 # round1
+print('ROUND 1')
 arima("../../data/train.csv", "../../data/test.csv")
 print('mape: ', give_mape('team25.csv', '../ValidationTester/ground_truth.csv'))
 
-
+# round2
+print('ROUND 2')
+arima("../SVM_round2/modified_train.csv", "../SVM_round2/modified_test.csv", isFuture=True)
 
