@@ -1,21 +1,28 @@
+# necessary imports
 import numpy as np
-import sklearn 
 import pandas as pd
+import sklearn 
 import matplotlib.pyplot as plt
 import scipy
-from scipy.integrate import odeint
 import math
-from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+# suppress convergence warnings
 import warnings
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 warnings.simplefilter('ignore', ConvergenceWarning)
 
 def arima(train_path, test_path, isFuture=False):
-    def predictARIMA(X, p, d, q, day):
-        model = ARIMA(X, order=(p,d,q)).fit()
-        prediction = model.predict(start = len(X), end = len(X) + days)
-        return prediction
+    '''Main driver function for ARIMA. Takes in training and testing path and extra flag to denote future prediction'''
 
+    CASES_PARAMS = (3,2,1)
+    DEATH_PARAMS = (4,2,3)
+    if isFuture:
+        days = 8
+    else:
+        days = 26
+
+    # --- LOAD AND PREPARE TRAINING AND TESTING DATA ---
     print('loading data...', end='')
     train = pd.read_csv(train_path)
     test = pd.read_csv(test_path)
@@ -26,43 +33,45 @@ def arima(train_path, test_path, isFuture=False):
         statesdata[s] = train.loc[train['Province_State'] == s ,:]
     print('done')
 
-    if isFuture:
-        days = 7
-    else:
-        days = 26
-
+    # --- MAKE STATE BY STATE PREDICTIONS ---
     print('making state predictions...', end='')
-    proj = {}
+    predictions = {}
     for s in states:
-        a = statesdata[s].reset_index()
-        confirmed = a['Confirmed']
-        deaths = a['Deaths']
+        temp = statesdata[s].reset_index()
+        confirmed_cases = temp['Confirmed'].values
+        deaths = temp['Deaths'].values
         
-        X, Y = confirmed.values, deaths.values
-        forecastC = predictARIMA(X, 3,2,1, days) # BEST PARAMS SO FAR ARE 3,2,1
-        forecastD = predictARIMA(Y, 4,2,3, days) # BEST PARAMS SO FAR ARE 4,2,3
+        cases_model = SARIMAX(confirmed_cases, order=CASES_PARAMS, enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
+        forecasted_cases = cases_model.forecast(days)
 
-        df = {'Confirmed': forecastC, 'Deaths': forecastD}
-        
-        proj[s] = pd.DataFrame(df)
+        deaths_model = SARIMAX(deaths, order=DEATH_PARAMS, enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
+        forecasted_deaths = deaths_model.forecast(days)
+
+        df = {'Confirmed': forecasted_cases, 'Deaths': forecasted_deaths}
+        predictions[s] = pd.DataFrame(df)
     print('done')
 
+    # --- COLLATE PREDICTIONS AND WRITE OUTPUT ---
     print('creating output file...', end='')
-    order = test.loc[0:49,'Province_State']
-    conf = []
-    dead = []
+    state_order = test.loc[0:49,'Province_State']
+    pred_cases = []
+    pred_dead = []
     fid = 0
     for i in range(days):
-        for j in order:
-            projection = proj[j].iloc[i]
-            conf.append(int(projection['Confirmed']))
-            dead.append(int(projection['Deaths']))
-            fid+=1
+        for j in state_order:
+            projection = predictions[j].iloc[i]
+            pred_cases.append(int(projection['Confirmed']))
+            pred_dead.append(int(projection['Deaths']))
+            fid += 1
 
-    test['Confirmed'] = conf
-    test['Deaths'] = dead
+    test['Confirmed'] = pred_cases
+    test['Deaths'] = pred_dead
     submission = test.drop(columns=['Province_State', 'Date'])
-    submission.to_csv('team25.csv', index = False, header = True)
+    if isFuture:
+        submission.to_csv('team25_round2.csv', index = False, header = True)
+    else:
+        submission.to_csv('team25_round1.csv', index = False, header = True)
+
     print('done')
 
 
@@ -87,8 +96,11 @@ def give_mape(ground_truth_path, prediction_path):
 
 
 # round1
+print('ROUND 1')
 arima("../../data/train.csv", "../../data/test.csv")
 print('mape: ', give_mape('team25.csv', '../ValidationTester/ground_truth.csv'))
 
-
+# round2
+print('ROUND 2')
+arima("../SVM_round2/modified_train.csv", "../SVM_round2/modified_test.csv", isFuture=True)
 
