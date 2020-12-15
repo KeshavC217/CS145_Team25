@@ -13,13 +13,13 @@ def give_mape(ground_truth_path, prediction_path):
     pred_dead = predictions['Deaths']
 
     total = 0
-    for i in range(1300):
+    for i in range(350):
         conf_error = float(pred_conf[i] - gt_conf[i]) / float(gt_conf[i])
         dead_error = float(pred_dead[i] - gt_dead[i]) / float(gt_dead[i])
         total = total + abs(conf_error) + abs(dead_error)
 
-    total = total / 2600
+    total = total / 700
     return total
 
 
-print(give_mape("ground_truth.csv", "team25Prophet.csv"))
+print(give_mape("ground_truth.csv", "team25.csv"))

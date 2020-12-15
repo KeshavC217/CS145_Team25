@@ -85,7 +85,7 @@ def sanity_plot(state_no):
 
     plt.show()
 
-
-sanity_plot(15)
+sanity_plot(7)
+sanity_plot(18)
 
 
